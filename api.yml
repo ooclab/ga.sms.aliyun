@@ -1,0 +1,205 @@
+openapi: '3.0.2'
+info:
+  title: 阿里云短信服务接口
+  version: '1.0'
+  description: |
+    注意
+    
+    1. 时间字符串，如无特殊说明，皆为 RFC3339 UTC
+    
+    [阿里云短信服务接口](https://api.aliyun.com/?spm=a2c4g.11186623.2.13.1d8051c14mUHUU#/?product=Dysmsapi&api=QuerySmsTemplate&tab=DEMO&lang=GO)
+
+servers:
+  - url: http://localhost:3000
+    description: 开发测试
+tags:
+  - name: sms
+    description: 短信接口
+
+paths:
+
+
+  "/":
+    get:
+      summary: 返回 YAML 格式的接口文档
+      responses:
+        '200':
+          description: OK
+
+
+  "/_health":
+    get:
+      summary: 服务健康检查
+      responses:
+        '200':
+          description: OK
+
+
+  "/ping":
+    get:
+      summary: ping - pong 测试接口
+      responses:
+        '200':
+          description: OK
+
+
+  "/sms/template/{template_code}":
+
+    parameters:
+    - name: template_code
+      in: path
+      required: true
+      schema:
+        type: string
+        description: 阿里云短信服务的模板 ID（如：SMS_174022705）
+
+    get:
+      tags:
+      - sms
+      summary: 获取模板
+      description: |
+        获取阿里云的短信模板
+
+        **成功** 阿里云接口返回值
+
+        ```json
+        {
+            "RequestId": "C36FEE52-F204-48F8-9EBE-64266D84E44F",
+            "Code": "OK",
+            "Message": "OK",
+            "TemplateStatus": 1,
+            "Reason": "无审批备注",
+            "TemplateCode": "SMS_168085626",
+            "TemplateType": 0,
+            "TemplateName": "身份验证验证码",
+            "TemplateContent": "验证码${code}，您正在进行身份验证，打死不要告诉别人哦！",
+            "CreateDate": "2019-06-17 10:31:26"
+        }
+        ```
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: success
+                  data:
+                    type: object
+                    properties:
+                      RequestId:
+                        type: string
+                        description: 阿里云返回值，"C36FEE52-F204-48F8-9EBE-64266D84E44F"
+                      Code:
+                        type: string
+                        description: OK 表示请求成功
+                      Message:
+                        type: string
+                        description: OK 表示请求成功
+                      TemplateStatus:
+                        type: integer
+                        description: 阿里云返回值，1
+                      Reason:
+                        type: string
+                      TemplateCode:
+                        type: string
+                      TemplateType:
+                        type: integer
+                      TemplateName:
+                        type: string
+                      TemplateContent:
+                        type: string
+                        description: 模板内容
+                      CreateDate:
+                        type: string
+                        description: 创建时间
+
+
+  "/sms/send":
+  
+    post:
+      tags:
+      - sms
+      summary: 发送短信
+      description: |
+        发送短信示例：
+
+        ```json
+        {
+          "sign_name": "超验科技",
+          "template_code": "{{TEMPLATE_CODE}}",
+          "phone_numbers": ["手机1", "手机2"],
+          "template_param": {"code": "123456"}
+        }
+        ```
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: 
+              - phone_numbers
+              - sign_name
+              - template_code
+              additionalProperties: false
+              properties:
+                phone_numbers:
+                  type: array
+                  items:
+                    type: string
+                    description: |
+                      接收短信的手机号码。
+                      
+                      格式：
+                      
+                      国内短信：11位手机号码，例如15951955195。
+                      国际/港澳台消息：国际区号+号码，例如85200000000。
+                      支持对多个手机号码发送短信，手机号码之间以英文逗号（,）分隔。上限为1000个手机号码。批量调用相对于单条调用及时性稍有延迟。
+                      
+                      验证码类型短信，建议使用单独发送的方式。
+                sign_name:
+                  type: string
+                  description: |
+                    短信签名名称。请在控制台签名管理页面签名名称一列查看。
+                    
+                    必须是已添加、并通过审核的短信签名。
+                template_code:
+                  type: string
+                  description: |
+                    短信模板ID。请在控制台模板管理页面模板CODE一列查看。
+                    
+                    必须是已添加、并通过审核的短信签名；且发送国际/港澳台消息时，请使用国际/港澳台短信模版。
+                template_param:
+                  type: object
+                  description: |
+                    短信模板变量对应的实际值，JSON格式。
+                    
+                    如果JSON中需要带换行符，请参照标准的JSON协议处理。
+                    
+                    示例：
+                    
+                    ```json
+                    {"code": "123456"}
+                    ```
+                  additionalProperties: true
+                sms_up_extend_code:
+                  type: string
+                  description: 上行短信扩展码，无特殊需要此字段的用户请忽略此字段。
+                out_id:
+                  type: string
+                  description: 外部流水扩展字段。
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: success

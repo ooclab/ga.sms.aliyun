@@ -12,7 +12,7 @@ RUN apk update \
     && apk add --no-cache \
     ca-certificates \
     && update-ca-certificates 2>/dev/null || true
-COPY --from=builder /go/src/github.com/ooclab/ga.sms.aliyun /usr/bin/ga.sms.aliyun
+COPY --from=builder /go/src/github.com/ooclab/ga.sms.aliyun/ga.sms.aliyun /usr/bin/ga.sms.aliyun
 COPY --from=builder /go/src/github.com/ooclab/ga.sms.aliyun/api.yml /work/api.yml
 EXPOSE 3000
 CMD ["/usr/bin/ga.sms.aliyun", "serve", "-v"]

@@ -23,3 +23,7 @@ export GA_SMS_ACCESS_KEY_SECRET=<你的阿里云短信服务 AccessKeySecret>
 ```shell
 ./ga.sms.aliyun serve -v --port=3000
 ```
+
+## TODO
+
+- [ ] 支持发送频次限制（来源 IP，发送到的手机号等）
